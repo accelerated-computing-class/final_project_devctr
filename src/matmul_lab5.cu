@@ -14,6 +14,9 @@
 #include <utility>
 #include <vector>
 
+// CUTLASS includes.
+#include <cutlass/gemm/device/gemm.h>
+
 void cuda_check(cudaError_t code, const char *file, int line) {
     if (code != cudaSuccess) {
         std::cerr << "CUDA error at " << file << ":" << line << ": "
@@ -602,6 +605,70 @@ void launch_matmul_improved_reduce(
 
 }; // namespace matmul_improved_reduce
 
+namespace matmul_cutlass {
+
+void launch_matmul_cutlass(
+    int32_t size_i,
+    int32_t size_j,
+    int32_t size_k,
+    float const *a,
+    float const *b,
+    float *c,
+    void *workspace) {
+    // Define data types for the computation.
+    using ElementInputA = float;
+    using ElementInputB = float;
+    using ElementOutput = float;
+    using ElementAccumulator = float;
+    using ElementCompute = float;
+
+    // Define the layouts of the matrices (row-major in this case).
+    using LayoutInputA = cutlass::layout::RowMajor;
+    using LayoutInputB = cutlass::layout::RowMajor;
+    using LayoutOutput = cutlass::layout::RowMajor;
+
+    // Define the GEMM operation.
+    using Gemm = cutlass::gemm::device::Gemm<
+        ElementInputA, LayoutInputA,
+        ElementInputB, LayoutInputB,
+        ElementOutput, LayoutOutput,
+        ElementAccumulator>;
+
+    // Create GEMM arguments.
+    ElementCompute alpha = 1.0f;
+    ElementCompute beta = 0.0f;
+    typename Gemm::Arguments args(
+        {size_i, size_j, size_k},
+        {a, size_k},     // Tensor A (device pointer and leading dimension)
+        {b, size_j},     // Tensor B (device pointer and leading dimension)
+        {c, size_j},     // Tensor C (device pointer and leading dimension)
+        {c, size_j},     // Tensor D (output tensor)
+        {alpha, beta}      // Scalars used in the epilogue
+    );
+    Gemm gemm_op;
+
+    // Check and init GEMM.
+    cutlass::Status status = gemm_op.can_implement(args);
+    if (status != cutlass::Status::kSuccess) {
+        std::cout << "Unsupported operation\n";
+        return;
+    }
+
+    status = gemm_op.initialize(args);
+    if (status != cutlass::Status::kSuccess) {
+        std::cout << "Failed to init GEMM\n";
+        return;
+    }
+
+    // Launch GEMM.
+    status = gemm_op();
+    if (status != cutlass::Status::kSuccess) {
+        std::cout << "Failed to run GEMM\n";
+        return;
+    }
+}
+
+}; // namespace matmul_cutlass
 
 /***********************/
 /* END SOLUTION CODE   */
@@ -911,6 +978,32 @@ struct MatmulImprovedReduce {
     }
 };
 
+struct MatmulCUTLASS {
+    constexpr static char const *name = "matmul_cutlass";
+
+    static size_t get_workspace_size(int32_t size_i, int32_t size_j, int32_t size_k) {
+        return 0;
+    }
+
+    static void
+    run(int32_t size_i,
+        int32_t size_j,
+        int32_t size_k,
+        float const *a,
+        float const *b,
+        float *c,
+        void *workspace) {
+        matmul_cutlass::launch_matmul_cutlass(
+            size_i,
+            size_j,
+            size_k,
+            a,
+            b,
+            c,
+            workspace);
+    }
+};
+
 std::vector<BenchmarkResults> run_all_impls(
     Phase phase,
     TestData const &data,
@@ -921,6 +1014,7 @@ std::vector<BenchmarkResults> run_all_impls(
 #endif
     results.push_back(run_all_configs<MatmulImproved>(phase, data, configs));
     results.push_back(run_all_configs<MatmulImprovedReduce>(phase, data, configs));
+    results.push_back(run_all_configs<MatmulCUTLASS>(phase, data, configs));
     return results;
 }
 
