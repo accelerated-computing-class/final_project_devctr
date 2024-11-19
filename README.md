@@ -1,10 +1,6 @@
 # Towards reproducible builds with Docker development containers
 
-TODO: intro
-
-## Usage
-
-### Create your own development environment
+## Create your own development environment
 
 * create you own development environment by installing all required packages, libraries, dependencies, environmental variables, paths, and anything required to build your project by adding stuff into the `devctr/Dockerfile`
     * the provided Dockerfile already contains `cuda:11.8.0` toolchain and `python3`
@@ -16,7 +12,7 @@ TODO: intro
 
 Now you can build things inside this development container anywhere, without "it works on my machine" issues anymore and without installing anything (which might be very complicated and messy sometimes) on your physical machine (host).
 
-### Building your projects and (OPTIONAL) executing via telerun
+## Building your projects and (OPTIONAL) executing via telerun
 
 * put your project you want to build inside `src` folder
 * write what should be called to build your project in `src/build.sh`
