@@ -12,4 +12,13 @@
 echo "Content:"; ls
 
 # Run binary.
+echo -e "\nCUDA tests..."
 ./vector_add
+
+# Run JAX tests.
+echo -e "JAX tests...\n"
+python3 jax_test.py
+
+# Run torch tests.
+echo -e "torch tests...\n"
+python3 torch_test.py
