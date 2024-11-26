@@ -12,9 +12,3 @@ echo "Building the project..."
 # -----     * the current workdir contains all files from your src/
 # -----     * all output files (e.g. generated binaries, test inputs, etc.) must be places into $CTR_BUILD_DIR
 # ----------------------------------------------------------------------------------
-# Build code.
-nvcc -O3 vector_add.cu -o ${CTR_BUILD_DIR}/vector_add
-
-# Copy JAX and torch tests.
-cp jax_test.py ${CTR_BUILD_DIR}/
-cp torch_test.py ${CTR_BUILD_DIR}/

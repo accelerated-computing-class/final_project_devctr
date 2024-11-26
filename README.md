@@ -1,25 +1,20 @@
 # Towards reproducible builds with Docker development containers
 
-## Create your own development environment
+## Large dataset example.
 
-* create you own development environment by installing all required packages, libraries, dependencies, environmental variables, paths, and anything required to build your project by adding stuff into the `devctr/Dockerfile`
-    * the provided Dockerfile already contains `cuda:11.8.0` toolchain and `python3`
-* build your own development environment: `./devtool build_devctr`
-* (OPTIONALLY) If you want to share your development environment with other people:
-    * register on [Dockerhub](https://hub.docker.com/)
-    * change `DOCKER_HUB_USERNAME` in `devtool` to your username
-    * push changes with `docker push <your username>:6_s894_finalproject_devctr:latest`
+This example demonstrates using external services (e.g. Kaggle) to store large datasets and use them on Telerun GPU server (or any remote GPU server).
 
-Now you can build things inside this development container anywhere, without "it works on my machine" issues anymore and without installing anything (which might be very complicated and messy sometimes) on your physical machine (host).
+### Upload the dataset
+* register on [Kaggle](https://www.kaggle.com/)
+* go `Datasets` -> `New Dataset`
+* drag & drop your files
+    * Kaggle might have issues with making public datasets, so first, make it private
+* go `You Work` -> `<You Dataset Name>`
+* click `Edit`
+* make `Public` if you previously made it private
+* wait a bit (depending on the size of your dataset)
+* go to `Download` -> `Download via: cURL` -> and use the URL starting with `https://www.kaggle.com/api/v1/datasets/download/1/...` to download the dataset from anywhere.
 
-## Building your projects and (OPTIONAL) executing via Telerun
+### Download and cache the dataset on the GPU server
 
-* put your project you want to build inside `src` folder
-* write what should be called to build your project in `src/build.sh`
-    * if you want to add some test input files along your binaries, write instructions in `build.sh` as well
-* (OPTIONAL) write what should be executed on the GPU server in `src/run.sh`
-* build it: `./devtool build_project`
-* the output can be found in `build` folder and all together in `build.tar`
-* (OPTIONAL) `build.tar` is shippable for execution via `Telerun`:
-    * `python3 <path_to_telerun.py> submit build.tar`
-    * Telerun will execute your `run.sh`
+See example [run.sh](src/run.sh) on how to do this.

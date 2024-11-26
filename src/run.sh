@@ -8,17 +8,22 @@
 # -----     * feel free to execute `ls` form here to check the content of the workdir
 # ----------------------------------------------------------------------------------
 
-# We can see what's on the execution server in the home dir:
-echo "Content:"; ls
+# Cache the dataset.
+FILE_PATH="/tmp/dreamteam.dataset"
+FILE_URL="https://www.kaggle.com/api/v1/datasets/download/<USERNAME>/<DATASET_NAME>"
 
-# Run binary.
-echo -e "\nCUDA tests..."
-./vector_add
+if [ ! -f "$FILE_PATH" ]; then
+    echo "File does not exist. Downloading..."
+    wget --no-verbose -O ${FILE_PATH} ${FILE_URL}
+    if [ $? -eq 0 ]; then
+        echo "Download completed successfully."
+    else
+        echo "Download failed."
+        exit 1
+    fi
+else
+    echo "File already exists. Skipping download."
+fi
 
-# Run JAX tests.
-echo -e "JAX tests...\n"
-python3 jax_test.py
-
-# Run torch tests.
-echo -e "torch tests...\n"
-python3 torch_test.py
+# Do something with the dataset.
+ls -lh ${FILE_PATH}
