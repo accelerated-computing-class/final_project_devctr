@@ -12,13 +12,8 @@
 echo "Content:"; ls
 
 # Run binary.
-echo -e "\nCUDA tests..."
-./vector_add
+python3 setup.py build
 
-# Run JAX tests.
-echo -e "JAX tests...\n"
-python3 jax_test.py
+mv build/lib.linux-x86_64-3.10/cuda_extension.cpython-310-x86_64-linux-gnu.so cuda_extension.so
 
-# Run torch tests.
-echo -e "torch tests...\n"
-python3 torch_test.py
+python3 example.py

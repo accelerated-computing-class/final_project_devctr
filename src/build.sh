@@ -13,8 +13,13 @@ echo "Building the project..."
 # -----     * all output files (e.g. generated binaries, test inputs, etc.) must be places into $CTR_BUILD_DIR
 # ----------------------------------------------------------------------------------
 # Build code.
-nvcc -O3 vector_add.cu -o ${CTR_BUILD_DIR}/vector_add
+# nvcc -O3 vector_add.cu -o ${CTR_BUILD_DIR}/vector_add
 
-# Copy JAX and torch tests.
-cp jax_test.py ${CTR_BUILD_DIR}/
-cp torch_test.py ${CTR_BUILD_DIR}/
+# # Copy JAX and torch tests.
+cp setup.py ${CTR_BUILD_DIR}/
+cp extension.cpp ${CTR_BUILD_DIR}/
+cp extension_kernel.cu ${CTR_BUILD_DIR}/
+cp example.py ${CTR_BUILD_DIR}/
+
+export TORCH_CUDA_ARCH_LIST='8.6'
+python3 setup.py build
