@@ -8,12 +8,5 @@
 # -----     * feel free to execute `ls` form here to check the content of the workdir
 # ----------------------------------------------------------------------------------
 
-# We can see what's on the execution server in the home dir:
-echo "Content:"; ls
-
-# Run binary.
-python3 setup.py build
-
-mv build/lib.linux-x86_64-3.10/cuda_extension.cpython-310-x86_64-linux-gnu.so cuda_extension.so
-
+# Run.
 python3 example.py

@@ -16,6 +16,7 @@ std::vector<torch::Tensor> my_cuda_function(torch::Tensor input_tensor) {
     int threads = 1024;
     int blocks = (size + threads - 1) / threads;
     add_one_kernel<<<blocks, threads>>>(data, size);
+    cudaDeviceSynchronize();
 
     return {input_tensor};
 }
